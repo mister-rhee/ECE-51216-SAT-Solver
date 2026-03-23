@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
+import logging
 from pysat.formula import CNF
+
+logger = logging.getLogger(__name__)
 
 def dimacs_parser(filepath):
     # 1. Read and filter the file content
@@ -28,11 +31,11 @@ def dimacs_parser(filepath):
     return cnf
 
 def print_parsed_data(parsed_cnf):
-    print(f"Number of variables: {parsed_cnf.nv}")
-    print(f"Number of clauses: {len(parsed_cnf.clauses)}")
+    logger.info(f"Number of variables: {parsed_cnf.nv}")
+    logger.info(f"Number of clauses: {len(parsed_cnf.clauses)}")
 
     for idx, clause in enumerate(parsed_cnf.clauses):
-        print(f"Clause {idx}: {clause}")
+        logger.debug(f"Clause {idx}: {clause}")
 
 if __name__ == "__main__":
     user_input = input("Filepath: ")
