@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from pysat.formula import CNF
 
 def dimacs_parser(filepath):
@@ -23,16 +25,16 @@ def dimacs_parser(filepath):
     # 3. Parse from string instead of file path
     cnf = CNF(from_string=clean_content)
 
-    print(f"Number of variables: {cnf.nv}")
-    print(f"Number of clauses: {len(cnf.clauses)}")
-
-    for idx, clause in enumerate(cnf.clauses):
-        print(f"Clause {idx}: {clause}")
-
     return cnf
 
-# def print_parsed_data(parsed_cnf):
-    # Access the parsed data
+def print_parsed_data(parsed_cnf):
+    print(f"Number of variables: {parsed_cnf.nv}")
+    print(f"Number of clauses: {len(parsed_cnf.clauses)}")
 
-user_input = input("Filepath: ")
-dimacs_parser(user_input)
+    for idx, clause in enumerate(parsed_cnf.clauses):
+        print(f"Clause {idx}: {clause}")
+
+if __name__ == "__main__":
+    user_input = input("Filepath: ")
+    cnf = dimacs_parser(user_input)
+    print_parsed_data(cnf)
