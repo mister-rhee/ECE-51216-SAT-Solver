@@ -2,6 +2,7 @@
 
 import logging
 import numpy as np
+# from main import timer
 
 logger = logging.getLogger(__name__)
 
@@ -25,18 +26,23 @@ def dpll(parsed_cnf):
         # The new pointer is the current total length of 'values'
         row_ptr.append(len(values))
 
-    logger.info(f"Length of Values Array:   {len(values)}")
-    logger.info(f"Values:                   {values}\n")
+    logger.debug(f"Length of Values Array:   {len(values)}")
+    logger.debug(f"Values:                   {values}\n")
 
-    logger.info(f"Length of Column Array:   {len(col_indices)}")
-    logger.info(f"Column Indices:           {col_indices}\n")
+    logger.debug(f"Length of Column Array:   {len(col_indices)}")
+    logger.debug(f"Column Indices:           {col_indices}\n")
 
-    logger.info(f"Length of Row Array:      {len(row_ptr)}")
-    logger.info(f"Row Pointers:             {row_ptr}\n")
+    logger.debug(f"Length of Row Array:      {len(row_ptr)}")
+    logger.debug(f"Row Pointers:             {row_ptr}\n")
+
+    # with timer("Literal Selection"):
+    #     literal_counts = get_literal_counts(values, col_indices, parsed_cnf.nv)
+    #     literal_to_try = select_literal(*literal_counts)
 
     literal_counts = get_literal_counts(values, col_indices, parsed_cnf.nv)
     literal_to_try = select_literal(*literal_counts)
-    logger.info(f"Selected literal to try: {literal_to_try}")
+
+    logger.debug(f"Selected literal to try: {literal_to_try}")
 
 # Function that counts the number of positive and negative occurrences of each variable in the CNF formula
 def get_literal_counts(values, col_indices, num_literals):
