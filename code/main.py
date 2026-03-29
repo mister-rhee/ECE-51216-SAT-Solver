@@ -4,6 +4,7 @@ import argparse
 import logging
 
 from dimacs_parser import *
+from dpll import *
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +32,11 @@ def main():
     ### Call dimacs parser
     logger.debug("Calling functions in dimacs_parser.py")
     cnf = dimacs_parser(args.input)
-    print_parsed_data(cnf)
+    # print_parsed_data(cnf)
+
+    ### Call DPLL solver
+    logger.debug("Calling functions in dpll.py")
+    dpll(cnf)
 
 if __name__ == "__main__":
     main()
