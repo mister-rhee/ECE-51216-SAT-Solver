@@ -51,10 +51,14 @@ def main():
     ### Call DPLL solver
     logger.debug("Calling functions in dpll.py")
     with timer("DPLL Solver"):
-        dpll(cnf)
+        return dpll(cnf)
 
 if __name__ == "__main__":
     start_time = time.perf_counter()
-    main()
+    sat_status, assignments = main()
     end_time = time.perf_counter()
     logger.info(f"Execution time: {end_time - start_time:.6f} seconds")
+    if sat_status:
+        exit(0)
+    else:
+        exit(1)

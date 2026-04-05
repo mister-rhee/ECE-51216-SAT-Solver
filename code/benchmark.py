@@ -41,7 +41,9 @@ def run_benchmarks():
             duration = time.perf_counter() - start_time
 
             if process.returncode == 0:
-                status = "SUCCESS"
+                status = "SAT"
+            elif process.returncode == 1:
+                status = "UNSAT"
             else:
                 status = "FAILED"
                 logging.error(f"Error in {cnf_file}: {process.stderr}")
@@ -80,11 +82,11 @@ def save_to_csv(results):
 
 def generate_histogram(results):
     # Separate successful runs from failures
-    success_times = [r['time'] for r in results if r['status'] == "SUCCESS"]
-    failed_names = [r['name'] for r in results if r['status'] != "SUCCESS"]
+    success_times = [r['time'] for r in results if r['status'] in ["SAT", "UNSAT"]]
+    failed_names = [r['name'] for r in results if r['status'] not in ["SAT", "UNSAT"]]
 
     if not success_times:
-        print("No successful runs to plot.")
+        print("No successful runs (SAT/UNSAT) to plot.")
         return
 
     plt.figure(figsize=(10, 6))

@@ -42,11 +42,11 @@ def dpll(parsed_cnf):
 
     # Kick off the recursive search
     logger.debug(f"Starting recursive dpll_step call.")
-    is_sat, model = dpll_step(values, col_indices, row_ptr, parsed_cnf.nv, [], 0)
+    is_sat, all_assignments = dpll_step(values, col_indices, row_ptr, parsed_cnf.nv, [], 0)
 
     if is_sat:
-        logger.info(f"Formula is SAT. Model: {model}")
-        return True, model
+        logger.info(f"Formula is SAT. Assignments: {all_assignments}")
+        return True, all_assignments
     else:
         logger.info("Formula is UNSAT.")
         return False, []
@@ -76,13 +76,14 @@ def dpll_step(values, col_indices, row_ptr, num_vars, assignments, recursion_lev
         if len(row_ptr) == 1: # All clauses satisfied by BCP
             return True, assignments + bcp_assignments
 
-    assignments += bcp_assignments
+    # Need a new variable so as to not overwrite the higher recursion level's value
+    current_total_assignments = assignments + bcp_assignments
 
     literal_to_try = get_next_literal(values, col_indices, row_ptr, num_vars)
 
     # Quick check if all clauses satisfied (No literals left to pick)
     if literal_to_try is None:
-        return True, assignments
+        return True, current_total_assignments
 
     # Try the selected literal
     logger.debug(f"R{recursion_level}. Trying to remove {literal_to_try}")
@@ -91,10 +92,10 @@ def dpll_step(values, col_indices, row_ptr, num_vars, assignments, recursion_lev
     if not conflict:
         # Check if formula is empty (SAT)
         if len(nxt_row_ptr) == 1:
-            return True, assignments + [literal_to_try]
+            return True, current_total_assignments + [literal_to_try]
 
         # Recurse deeper
-        sat, final_assignments = dpll_step(nxt_values, nxt_col_indices, nxt_row_ptr, num_vars, assignments + [literal_to_try], recursion_level+1)
+        sat, final_assignments = dpll_step(nxt_values, nxt_col_indices, nxt_row_ptr, num_vars, current_total_assignments + [literal_to_try], recursion_level+1)
         if sat:
             return True, final_assignments
 
@@ -106,9 +107,9 @@ def dpll_step(values, col_indices, row_ptr, num_vars, assignments, recursion_lev
 
     if not conflict:
         if len(nxt_row_ptr) == 1:
-            return True, assignments + [negated_literal]
+            return True, current_total_assignments + [negated_literal]
 
-        return dpll_step(nxt_values, nxt_col_indices, nxt_row_ptr, num_vars, assignments + [negated_literal], recursion_level+1)
+        return dpll_step(nxt_values, nxt_col_indices, nxt_row_ptr, num_vars, current_total_assignments + [negated_literal], recursion_level+1)
 
     # Both branches failed
     return False, []
