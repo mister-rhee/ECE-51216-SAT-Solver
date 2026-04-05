@@ -41,6 +41,7 @@ def dpll(parsed_cnf):
     logger.debug(f"Row Pointers:             {row_ptr}\n")
 
     # Kick off the recursive search
+    logger.debug(f"Starting recursive dpll_step call.")
     is_sat, model = dpll_step(values, col_indices, row_ptr, parsed_cnf.nv, [], 0)
 
     if is_sat:
@@ -54,6 +55,7 @@ def dpll(parsed_cnf):
 #   Returns the status and the assignments made so far
 def dpll_step(values, col_indices, row_ptr, num_vars, assignments, recursion_level):
 
+    # Boolean constraint propogation. Force unit-clause assignments until there aren't any unit-clauses
     bcp_assignments = []
     while True:
         unit_literals = find_unit_clauses(row_ptr, col_indices, values)
@@ -73,6 +75,8 @@ def dpll_step(values, col_indices, row_ptr, num_vars, assignments, recursion_lev
 
         if len(row_ptr) == 1: # All clauses satisfied by BCP
             return True, assignments + bcp_assignments
+
+    assignments += bcp_assignments
 
     literal_to_try = get_next_literal(values, col_indices, row_ptr, num_vars)
 
@@ -94,8 +98,7 @@ def dpll_step(values, col_indices, row_ptr, num_vars, assignments, recursion_lev
         if sat:
             return True, final_assignments
 
-    # Backtrack if there was a conflict
-    #   Try the exact opposite assignment
+    # Backtrack if there was a conflict. Try the exact opposite assignment
     negated_literal = -literal_to_try
     logger.debug(f"R{recursion_level}. Backtracking: Trying {negated_literal} instead of {literal_to_try}")
 
@@ -110,6 +113,7 @@ def dpll_step(values, col_indices, row_ptr, num_vars, assignments, recursion_lev
     # Both branches failed
     return False, []
 
+# Removes the target literal from the current arrays. Uses index masks for efficiency
 def simplify_cnf(values, col_indices, row_ptr, assignment):
     target_var = abs(assignment) - 1
     target_pol = 1 if assignment > 0 else -1
@@ -117,7 +121,7 @@ def simplify_cnf(values, col_indices, row_ptr, assignment):
     # Find where the literal being removed lives in the col_indices array
     var_locs = np.where(col_indices == target_var)[0]
 
-    # Find the clauses that these locations belong to
+    # Find the clauses that the literal locations belong to
     affected_clause_ids = np.searchsorted(row_ptr, var_locs, side='right') - 1
 
     # Determine which clauses are satisfied and which literals are removed
@@ -150,11 +154,11 @@ def simplify_cnf(values, col_indices, row_ptr, assignment):
     #   We only care about counts in clauses that weren't satisfied
     remaining_lit_counts = np.bincount(np.repeat(np.arange(len(row_ptr)-1), clause_lengths)[literal_mask], minlength=len(row_ptr)-1)
 
-    # If an unsatisfied clause now has 0 literals, it's a conflict
+    # If an unsatisfied clause has 0 literals, it's a conflict
     if np.any((remaining_lit_counts == 0) & (~satisfied_clause_mask)):
         return None, None, None, True
 
-    # Only keep counts for clauses that are still "active"
+    # Only keep counts for clauses that aren't satisfied yet
     active_counts = remaining_lit_counts[~satisfied_clause_mask]
     new_row_ptr = np.zeros(len(active_counts) + 1, dtype=np.int32)
     new_row_ptr[1:] = np.cumsum(active_counts)
@@ -171,10 +175,9 @@ def get_next_literal(values, col_indices, row_ptr, num_vars):
     else:
         return None
 
-# Searches the CNF for unit clauses
+# Searches the CNF for unit-clauses
 def find_unit_clauses(row_ptr, col_indices, values):
     unit_literals = []
-    # Fixed: row_ptr[i+1] - row_ptr[i] gives the number of literals in clause i
     for i in range(len(row_ptr) - 1):
         if (row_ptr[i+1] - row_ptr[i]) == 1:
             idx = row_ptr[i]
@@ -184,7 +187,6 @@ def find_unit_clauses(row_ptr, col_indices, values):
 
 # Counts the occurance of a literal in the CNF
 def get_literal_counts(values, col_indices, num_literals):
-
     # Create masks for positive and negative literals
     pos_mask = (values == 1)
     neg_mask = (values == -1)
@@ -204,7 +206,6 @@ def select_literal(pos_counts, neg_counts):
         return int(best_var_idx + 1)
     else:
         return int(-(best_var_idx + 1))
-
 
 if __name__ == "__main__":
     print("Not meant to be run directly. Please use 'main.py' to execute the program.")
