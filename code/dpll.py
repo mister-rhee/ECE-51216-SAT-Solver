@@ -3,6 +3,7 @@
 import logging
 import numpy as np
 # from main import timer
+import moms
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,7 @@ def dpll(parsed_cnf):
 
         # The new pointer is the current total length of 'values'
         row_ptr.append(len(values))
-
+        
     # Convert the arrays to numpy arrays for efficiency
     values = np.array(values, dtype=np.int8)
     col_indices = np.array(col_indices, dtype=np.int32)
