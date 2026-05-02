@@ -3,6 +3,7 @@
 import argparse
 import logging
 import time
+import re
 from contextlib import contextmanager
 
 from dimacs_parser import *
@@ -30,6 +31,9 @@ def parse_arguments():
     # Optional args
     parser.add_argument("-v", "--verbose", action="store_true", help="Optional flag to enable verbose stdout messages")
 
+    # Option to log output to file
+    parser.add_argument("-l", "--log", action="store_true", help="Optional flag to log stdout messages to an output file")
+
     ## Pull the values out of the arguments
     return parser.parse_args()
 
@@ -41,7 +45,17 @@ def main():
     log_level = logging.DEBUG if args.verbose else logging.INFO
     log_format = ("%(levelname)s [%(filename)s:%(lineno)d]: %(message)s" if args.verbose else "%(levelname)s: %(message)s")
 
-    logging.basicConfig(level=log_level, format=log_format)
+    if args.log:
+        input_filename = re.search('(?<=/)[^/]+$', args.input).group(0)
+        
+        logging.basicConfig(
+            filename=f"log/{input_filename}.log",
+            filemode='w',
+            format=log_format,
+            level=log_level
+        )
+    else:
+        logging.basicConfig(level=log_level, format=log_format)
 
     ### Call dimacs parser
     logger.debug("Calling functions in dimacs_parser.py")
