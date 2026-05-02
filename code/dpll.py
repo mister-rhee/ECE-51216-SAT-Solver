@@ -208,6 +208,8 @@ def select_literal(pos_counts, neg_counts):
         return int(best_var_idx + 1)
     else:
         return int(-(best_var_idx + 1))
+    
+    return moms.calculate_score(pos_counts, neg_counts)
 
 if __name__ == "__main__":
     print("Not meant to be run directly. Please use 'main.py' to execute the program.")
