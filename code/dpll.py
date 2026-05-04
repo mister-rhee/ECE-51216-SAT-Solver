@@ -4,6 +4,7 @@ import logging
 import numpy as np
 # from main import timer
 import moms
+import globals
 
 logger = logging.getLogger(__name__)
 
@@ -187,7 +188,7 @@ def find_unit_clauses(row_ptr, col_indices, values):
             unit_literals.append(literal)
     return unit_literals
 
-# Counts the occurance of a literal in the CNF
+# Counts the occurrence of a literal in the CNF
 def get_literal_counts(values, col_indices, num_literals):
     # Create masks for positive and negative literals
     pos_mask = (values == 1)
@@ -201,6 +202,9 @@ def get_literal_counts(values, col_indices, num_literals):
 # Returns the most-recurring literal for now.
 #   Once conflict-driven learning is implemented, we'll probably weigh the learned clauses more heavily
 def select_literal(pos_counts, neg_counts):
+    if globals.args.mom:
+        return moms.calculate_score(pos_counts, neg_counts)
+
     total_counts = pos_counts + neg_counts
     best_var_idx = np.argmax(total_counts)
 

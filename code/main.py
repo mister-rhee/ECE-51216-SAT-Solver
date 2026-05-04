@@ -3,7 +3,8 @@
 import argparse
 import logging
 import time
-import re
+import globals
+from pathlib import Path
 from contextlib import contextmanager
 
 from dimacs_parser import *
@@ -34,19 +35,23 @@ def parse_arguments():
     # Option to log output to file
     parser.add_argument("-l", "--log", action="store_true", help="Optional flag to log stdout messages to an output file")
 
+    # Option to use MOM
+    parser.add_argument("-m", "--mom", action="store_true", help="Run solver with Maximum Occurrence of Minimum Size heuristic")
+
     ## Pull the values out of the arguments
     return parser.parse_args()
 
 def main():
     ### Parse main level arguments
-    args = parse_arguments()
+    globals.args = parse_arguments()
 
     ### Configure the logging level and the format
-    log_level = logging.DEBUG if args.verbose else logging.INFO
-    log_format = ("%(levelname)s [%(filename)s:%(lineno)d]: %(message)s" if args.verbose else "%(levelname)s: %(message)s")
+    log_level = logging.DEBUG if globals.args.verbose else logging.INFO
+    log_format = ("%(levelname)s [%(filename)s:%(lineno)d]: %(message)s" if globals.args.verbose else "%(levelname)s: %(message)s")
 
-    if args.log:
-        input_filename = re.search('(?<=/)[^/]+$', args.input).group(0)
+    if globals.args.log:
+        path_obj = Path(globals.args.input)
+        input_filename = path_obj.stem
         
         logging.basicConfig(
             filename=f"log/{input_filename}.log",
@@ -60,7 +65,7 @@ def main():
     ### Call dimacs parser
     logger.debug("Calling functions in dimacs_parser.py")
     with timer("DIMACS Parser"):
-        cnf = dimacs_parser(args.input)
+        cnf = dimacs_parser(globals.args.input)
 
     ### Call DPLL solver
     logger.debug("Calling functions in dpll.py")
