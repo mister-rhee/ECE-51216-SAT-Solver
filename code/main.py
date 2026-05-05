@@ -3,12 +3,10 @@
 import argparse
 import logging
 import time
-import globals
 from pathlib import Path
 from contextlib import contextmanager
 
 from dimacs_parser import *
-from dpll import *
 
 logger = logging.getLogger(__name__)
 
@@ -39,29 +37,35 @@ def parse_arguments():
     # Option to use MOM
     parser.add_argument("-m", "--mom", action="store_true", help="Run solver with Maximum Occurrence of Minimum Size heuristic")
 
+    # Option to use Conflict Driven Clause Learning (CDCL)
+    parser.add_argument("-c", "--cdcl", action="store_true", help="Run solver with Conflict Driven Clause Learning (CDCL) heuristic.")
+
     ## Pull the values out of the arguments
     return parser.parse_args()
 
 def main():
     ### Parse main level arguments
-    globals.args = parse_arguments()
+    args = parse_arguments()
+
+    global use_moms_heuristic
+    use_moms_heuristic = args.mom
 
     ### Configure the logging level and the format
-    log_level = logging.DEBUG if globals.args.verbose else logging.INFO if globals.args.info else logging.WARNING
-    log_format = ("%(levelname)s [%(filename)s:%(lineno)d]: %(message)s" if globals.args.verbose else "%(levelname)s: %(message)s")
+    log_level = logging.DEBUG if args.verbose else logging.INFO if args.info else logging.WARNING
+    log_format = ("%(levelname)s [%(filename)s:%(lineno)d]: %(message)s" if args.verbose else "%(levelname)s: %(message)s")
 
-    if globals.args.log:
-        path_obj = Path(globals.args.input)
+    if args.log:
+        path_obj = Path(args.input)
         input_filename = path_obj.stem
 
         output_filename_string = f"log/{input_filename}"
-        if globals.args.verbose:
+        if args.verbose:
             output_filename_string = output_filename_string + ".v"
-        if globals.args.mom:
+        if args.mom:
             output_filename_string = output_filename_string + ".m"
 
         output_filename_string = output_filename_string + ".log"
-        
+
         logging.basicConfig(
             filename=output_filename_string,
             filemode='w',
@@ -74,12 +78,20 @@ def main():
     ### Call dimacs parser
     logger.debug("Calling functions in dimacs_parser.py")
     with timer("DIMACS Parser"):
-        cnf = dimacs_parser(globals.args.input)
+        cnf = dimacs_parser(args.input)
 
+    ### Call CDCL solver
+    if (args.cdcl):
+        from cdcl_solver import cdcl
+        logger.debug("Calling functions in cdcl_solver.py")
+        with timer("CDCL Solver"):
+            return cdcl(cnf)
     ### Call DPLL solver
-    logger.debug("Calling functions in dpll.py")
-    with timer("DPLL Solver"):
-        return dpll(cnf)
+    else:
+        from dpll import dpll
+        logger.debug("Calling functions in dpll.py")
+        with timer("DPLL Solver"):
+            return dpll(cnf)
 
 if __name__ == "__main__":
     start_time = time.perf_counter()

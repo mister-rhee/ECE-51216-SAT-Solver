@@ -4,7 +4,6 @@ import logging
 import numpy as np
 # from main import timer
 import moms
-import globals
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +26,7 @@ def dpll(parsed_cnf):
 
         # The new pointer is the current total length of 'values'
         row_ptr.append(len(values))
-        
+
     # Convert the arrays to numpy arrays for efficiency
     values = np.array(values, dtype=np.int8)
     col_indices = np.array(col_indices, dtype=np.int32)
@@ -205,7 +204,7 @@ def get_literal_counts(values, col_indices, num_literals):
 # Returns the most-recurring literal for now.
 #   Once conflict-driven learning is implemented, we'll probably weigh the learned clauses more heavily
 def select_literal(pos_counts, neg_counts):
-    if globals.args.mom:
+    if use_mom_heuristic:
         return moms.calculate_score(pos_counts, neg_counts)
 
     total_counts = pos_counts + neg_counts
