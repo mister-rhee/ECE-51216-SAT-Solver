@@ -52,9 +52,17 @@ def main():
     if globals.args.log:
         path_obj = Path(globals.args.input)
         input_filename = path_obj.stem
+
+        output_filename_string = f"log/{input_filename}"
+        if globals.args.verbose:
+            output_filename_string = output_filename_string + ".v"
+        if globals.args.mom:
+            output_filename_string = output_filename_string + ".m"
+
+        output_filename_string = output_filename_string + ".log"
         
         logging.basicConfig(
-            filename=f"log/{input_filename}.log",
+            filename=output_filename_string,
             filemode='w',
             format=log_format,
             level=log_level
