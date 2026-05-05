@@ -1,6 +1,6 @@
 # Directory Structure
 
-```/code``` contains all code
+```/code``` contains all code.\
 ```/prob``` contains three directories
 
 ```
@@ -13,7 +13,7 @@ which we used for testing and benchmarking, and two files
 3_input_and.cnf
 unsat.cnf
 ```
-which we created for testing.
+which we created for testing functionality.
 
 # Prerequisites
 No compilation necessary.

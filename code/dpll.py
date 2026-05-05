@@ -49,6 +49,7 @@ def dpll(parsed_cnf):
     if is_sat:
         logger.info(f"Formula is SAT. Assignments: {all_assignments}")
         print("RESULT:SAT")
+        print_assignments(all_assignments)
         return True, all_assignments
     else:
         logger.info("Formula is UNSAT.")
@@ -214,6 +215,25 @@ def select_literal(pos_counts, neg_counts):
         return int(best_var_idx + 1)
     else:
         return int(-(best_var_idx + 1))
+
+# Format assignments for stdout
+def print_assignments(assignments):
+        # Initialize sorted assignments array with -1
+        sorted_assignments = [-1] * np.abs(assignments).max()
+
+        for assignment in assignments:
+            if np.sign(assignment) == -1:
+                sorted_assignments[abs(assignment)-1] = 0
+            elif np.sign(assignment) == 1:
+                sorted_assignments[assignment-1] = 1
+            else:
+                pass
+
+        result_string = "ASSIGNMENT:"
+        for index, assignment in enumerate(sorted_assignments):
+            result_string = result_string + f"{index+1}={assignment} "
+
+        print(result_string)
 
 if __name__ == "__main__":
     print("Not meant to be run directly. Please use 'main.py' to execute the program.")
