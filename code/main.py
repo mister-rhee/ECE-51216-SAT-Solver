@@ -30,6 +30,7 @@ def parse_arguments():
     parser.add_argument("input", help="Input CNF path. Can be relative or absolute path", type=str)
 
     # Optional args
+    parser.add_argument("-i", "--info", action="store_true", help="Optional flag to enable basic stdout messages")
     parser.add_argument("-v", "--verbose", action="store_true", help="Optional flag to enable verbose stdout messages")
 
     # Option to log output to file
@@ -46,7 +47,7 @@ def main():
     globals.args = parse_arguments()
 
     ### Configure the logging level and the format
-    log_level = logging.DEBUG if globals.args.verbose else logging.INFO
+    log_level = logging.DEBUG if globals.args.verbose else logging.INFO if globals.args.info else logging.WARNING
     log_format = ("%(levelname)s [%(filename)s:%(lineno)d]: %(message)s" if globals.args.verbose else "%(levelname)s: %(message)s")
 
     if globals.args.log:
