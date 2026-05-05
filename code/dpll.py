@@ -48,9 +48,11 @@ def dpll(parsed_cnf):
 
     if is_sat:
         logger.info(f"Formula is SAT. Assignments: {all_assignments}")
+        print("RESULT:SAT")
         return True, all_assignments
     else:
         logger.info("Formula is UNSAT.")
+        print("RESULT:UNSAT")
         return False, []
 
 # Recursive function implementing the DPLL algorithm
