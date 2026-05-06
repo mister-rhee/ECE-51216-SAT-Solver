@@ -16,8 +16,8 @@ Contains all code.
 ## ```/prob```
 Contains conjunctive normal form (CNF) problem sets from [SATLIB](https://www.cs.ubc.ca/~hoos/SATLIB/benchm.html)
 
-```/uniform-random-3-sat``` 20 variables, 91 clauses - 1000 instances, all satisfiable
-```/dubois``` Randomly generated SAT instances - 13 instances, all unsatisfiable
+```/uniform-random-3-sat``` 20 variables, 91 clauses - 1000 instances, all satisfiable\
+```/dubois``` Randomly generated SAT instances - 13 instances, all unsatisfiable\
 ```/jnh``` Random SAT instances with variable length clauses - 16 instances satisfiable, 34 instances unsatisfiable
 
 These problems were used for testing and benchmarking. We wrote two simple CNF problems,
