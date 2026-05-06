@@ -18,9 +18,12 @@ which we created for testing functionality.
 # Prerequisites
 No compilation necessary.
 
-
 # How to run
+## Linux
 ```
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r code/requirements.txt
 cd code
 python3 mySAT.py {input_file}
 ```

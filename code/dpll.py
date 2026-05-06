@@ -220,7 +220,7 @@ def select_literal(pos_counts, neg_counts):
 def print_assignments(assignments):
         # Initialize sorted assignments array with -1
         sorted_assignments = [-1] * np.abs(assignments).max()
-        print(np.sort(assignments))
+        logger.info(np.sort(assignments))
 
         for assignment in assignments:
             if np.sign(assignment) == -1:
