@@ -149,11 +149,10 @@ def generate_histogram(results, result_path, option):
 
 if __name__ == "__main__":
     for prob in PROBLEM_SETS:
-        if (prob == "prob\dubois"):
+        problem_set_basename = os.path.basename(prob)
+        if (problem_set_basename == "uf75-325" or problem_set_basename == "uuf75-325"):
+            print(f"found {problem_set_basename}")
             for opt in OPTIONS:
-                if (opt != "none"):
-                    run_benchmarks(prob, opt)
-                else:
-                    pass
+                run_benchmarks(prob, opt)
         else:
             pass
