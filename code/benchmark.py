@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import logging
 
 # Configuration
-INPUT_DIR = "dimacs"
+INPUT_DIR = "prob/uniform-random-3-sat"
 SOLVER = "code/main.py"
 RESULTS_DIR = "results"
 OUTPUT_CHART = "results/benchmark_results.png"
@@ -32,7 +32,7 @@ def run_benchmarks():
         start_time = time.perf_counter()
         try:
             process = subprocess.run(
-                ["python3", SOLVER, file_path],
+                ["python", SOLVER, file_path],
                 capture_output=True,
                 text=True,
                 timeout=60
