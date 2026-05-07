@@ -149,5 +149,11 @@ def generate_histogram(results, result_path, option):
 
 if __name__ == "__main__":
     for prob in PROBLEM_SETS:
-        for opt in OPTIONS:
-            run_benchmarks(prob, opt)
+        if (prob == "prob\dubois"):
+            for opt in OPTIONS:
+                if (opt != "none"):
+                    run_benchmarks(prob, opt)
+                else:
+                    pass
+        else:
+            pass
