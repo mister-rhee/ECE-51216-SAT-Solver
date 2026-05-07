@@ -4,10 +4,10 @@
 
 Contains all code.
 
-```benchmark.py``` Contains benchmarking tools. No longer used in any way with the solver.\
+```benchmark.py``` Contains benchmarking and visualization tools.\
+```cdcl.py``` Contains the conflict-driven clause learning algorithm and its helper functions.\
 ```dimacs_parser.py``` Uses the CNF parser in the python-sat package in a wrapper function.\
 ```dpll.py``` Contains the DPLL algorithm and its helper functions.\
-```globals.py``` Initializes input arguments parser variable as a global variable.\
 ```main.py``` Contains main function which handles command line function call input argument parsing, CNF parser, and starts DPLL.\
 ```moms.py``` Contains Maximum Occurrences in clauses of Minimum Size decision heuristic.\
 ```mySAT.py``` Top-level interface for the code.\
@@ -29,9 +29,7 @@ to test functionality of the solver.
 
 # Prerequisites
 ```
-python3 -m venv venv
-source venv/bin/activate
-pip3 install -r code/requirements.txt
+pip3 install -r code/requirements.txt --user
 ```
 No compilation necessary.
 
