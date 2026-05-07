@@ -54,17 +54,14 @@ def cdcl_solve(values, col_indices, row_ptr, num_vars):
     decision_level = 0
 
     while True:
-        conflict_idx = cdcl_bcp(values, col_indices, row_ptr, assignment, assigned,
-                                 trail, var_level, var_reason, decision_level)
+        conflict_idx = cdcl_bcp(values, col_indices, row_ptr, assignment, assigned, trail, var_level, var_reason, decision_level)
 
         if conflict_idx is not None:
             if decision_level == 0:
                 logger.debug("Conflict at level 0: UNSAT.")
                 return False, []
 
-            learned_clause, backjump_lvl = analyze_conflict(
-                conflict_idx, trail, trail_lim, var_level, var_reason,
-                values, col_indices, row_ptr, decision_level)
+            learned_clause, backjump_lvl = analyze_conflict(conflict_idx, trail, trail_lim, var_level, var_reason, values, col_indices, row_ptr, decision_level)
             logger.debug(f"L{decision_level}. Conflict. Learned: {learned_clause}, backjump to L{backjump_lvl}")
 
             values, col_indices, row_ptr = add_learned_clause(values, col_indices, row_ptr, learned_clause)
@@ -79,8 +76,7 @@ def cdcl_solve(values, col_indices, row_ptr, num_vars):
                 return False, []
 
             logger.debug(f"L{decision_level}. Asserting UIP literal: {uip_lit}")
-            _assign(uip_lit, decision_level, learned_clause_idx,
-                    assignment, assigned, trail, var_level, var_reason)
+            _assign(uip_lit, decision_level, learned_clause_idx, assignment, assigned, trail, var_level, var_reason)
 
         else:
             lit = pick_literal(values, col_indices, assignment, assigned, num_vars)
@@ -95,8 +91,7 @@ def cdcl_solve(values, col_indices, row_ptr, num_vars):
 
 
 # BCP - scans all clauses and forces unit literals until no more are found or a conflict occurs
-def cdcl_bcp(values, col_indices, row_ptr, assignment, assigned, trail,
-             var_level, var_reason, decision_level):
+def cdcl_bcp(values, col_indices, row_ptr, assignment, assigned, trail, var_level, var_reason, decision_level):
     changed = True
     while changed:
         changed = False
@@ -140,8 +135,7 @@ def cdcl_bcp(values, col_indices, row_ptr, assignment, assigned, trail,
 
 
 # 1-UIP conflict analysis - resolves back through the trail until one literal remains at the current level
-def analyze_conflict(conflict_clause_idx, trail, trail_lim, var_level, var_reason,
-                     values, col_indices, row_ptr, decision_level):
+def analyze_conflict(conflict_clause_idx, trail, trail_lim, var_level, var_reason, values, col_indices, row_ptr, decision_level):
     in_clause = set()
     working = set()
 
@@ -191,8 +185,7 @@ def analyze_conflict(conflict_clause_idx, trail, trail_lim, var_level, var_reaso
 
         trail_idx -= 1
 
-    # Negate the clause literals to form the learned clause
-    learned_clause = [int(-pol) * (var + 1) for var, pol in in_clause]
+    learned_clause = [int(pol) * (var + 1) for var, pol in in_clause]
 
     levels = sorted({var_level[var] for var, _ in in_clause if var_level[var] >= 0}, reverse=True)
     backjump_lvl = levels[1] if len(levels) > 1 else 0
@@ -202,7 +195,7 @@ def analyze_conflict(conflict_clause_idx, trail, trail_lim, var_level, var_reaso
 
 # Undo all assignments above backjump_lvl
 def backjump(backjump_lvl, assignment, assigned, trail, trail_lim, var_level, var_reason):
-    target = trail_lim[backjump_lvl] if backjump_lvl < len(trail_lim) else 0
+    target = trail_lim[backjump_lvl + 1]
 
     while len(trail) > target:
         lit, _, _ = trail.pop()
@@ -219,11 +212,7 @@ def add_learned_clause(values, col_indices, row_ptr, learned_clause):
     new_vals = np.array([1 if l > 0 else -1 for l in learned_clause], dtype=np.int8)
     new_cols = np.array([abs(l) - 1 for l in learned_clause], dtype=np.int32)
     new_row_ptr = np.append(row_ptr, row_ptr[-1] + len(learned_clause))
-    return (
-        np.concatenate([values, new_vals]),
-        np.concatenate([col_indices, new_cols]),
-        new_row_ptr,
-    )
+    return (np.concatenate([values, new_vals]), np.concatenate([col_indices, new_cols]), new_row_ptr,)
 
 
 def _find_uip_in_learned(learned_clause, assigned):
