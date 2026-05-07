@@ -7,6 +7,8 @@ import moms
 
 logger = logging.getLogger(__name__)
 
+use_moms_heuristic = False
+
 def dpll(parsed_cnf):
     for term in parsed_cnf.clauses:
         logger.debug(term)
@@ -204,7 +206,7 @@ def get_literal_counts(values, col_indices, num_literals):
 # Returns the most-recurring literal for now.
 #   Once conflict-driven learning is implemented, we'll probably weigh the learned clauses more heavily
 def select_literal(pos_counts, neg_counts):
-    if use_mom_heuristic:
+    if use_moms_heuristic:
         return moms.calculate_score(pos_counts, neg_counts)
 
     total_counts = pos_counts + neg_counts

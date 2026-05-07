@@ -7,6 +7,7 @@ from pathlib import Path
 from contextlib import contextmanager
 
 from dimacs_parser import *
+import dpll
 
 logger = logging.getLogger(__name__)
 
@@ -47,8 +48,7 @@ def main():
     ### Parse main level arguments
     args = parse_arguments()
 
-    global use_moms_heuristic
-    use_moms_heuristic = args.mom
+    dpll.use_moms_heuristic = args.mom
 
     ### Configure the logging level and the format
     log_level = logging.DEBUG if args.verbose else logging.INFO if args.info else logging.WARNING
@@ -80,18 +80,10 @@ def main():
     with timer("DIMACS Parser"):
         cnf = dimacs_parser(args.input)
 
-    ### Call CDCL solver
-    if (args.cdcl):
-        from cdcl_solver import cdcl
-        logger.debug("Calling functions in cdcl_solver.py")
-        with timer("CDCL Solver"):
-            return cdcl(cnf)
     ### Call DPLL solver
-    else:
-        from dpll import dpll
-        logger.debug("Calling functions in dpll.py")
-        with timer("DPLL Solver"):
-            return dpll(cnf)
+    logger.debug("Calling functions in dpll.py")
+    with timer("DPLL Solver"):
+        return dpll.dpll(cnf)
 
 if __name__ == "__main__":
     start_time = time.perf_counter()
