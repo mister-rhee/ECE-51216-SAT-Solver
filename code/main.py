@@ -80,10 +80,17 @@ def main():
     with timer("DIMACS Parser"):
         cnf = dimacs_parser(args.input)
 
-    ### Call DPLL solver
-    logger.debug("Calling functions in dpll.py")
-    with timer("DPLL Solver"):
-        return dpll.dpll(cnf)
+    ### Call solver
+    if args.cdcl:
+        import cdcl
+        cdcl.use_moms_heuristic = args.mom
+        logger.debug("Calling functions in cdcl.py")
+        with timer("CDCL Solver"):
+            return cdcl.cdcl(cnf)
+    else:
+        logger.debug("Calling functions in dpll.py")
+        with timer("DPLL Solver"):
+            return dpll.dpll(cnf)
 
 if __name__ == "__main__":
     start_time = time.perf_counter()
